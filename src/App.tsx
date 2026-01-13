@@ -1,15 +1,14 @@
 import { Box, Container, Grid, styled } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { WebMidi } from "webmidi";
 import ButtonAppBar from "./components/ButtonAppBar";
 import "./App.css";
 
-const KeyButton = styled(
-  Box,
-  { shouldForwardProp: (prop) => prop !== "note" && prop !== "activeNote" }
-)<{ note?: string; activeNote?: string }>(({ note, activeNote }) => ({
+const KeyButton = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "activeNote",
+})<{ activeNote?: boolean }>(({ activeNote }) => ({
   alignItems: "flex-end",
-  backgroundColor: activeNote && note === activeNote ? "#ffd166" : "#FFF",
+  backgroundColor: activeNote ? "#ffd166" : "#FFF",
   border: "2px solid #eaeaea",
   borderRadius: "10px !important",
   boxShadow: "0 6px 0 0 #9d7002",
@@ -24,13 +23,47 @@ const KeyButton = styled(
 
 type WebMidi = typeof WebMidi;
 
+const initialState: { [key: string]: boolean } = {
+  C: false,
+  D: false,
+  E: false,
+  F: false,
+  G: false,
+  A: false,
+  B: false,
+};
+
+function reducer(
+  state: { [key: string]: boolean } = initialState,
+  action: { type: string; note: string }
+) {
+  switch (action.type) {
+    case "note_on": {
+      console.log("👨‍🎤 -> note_on:", action.note);
+      return { ...state, [action.note]: true };
+    }
+
+    case "note_off": {
+      console.log("👨‍🎤 -> note_off:", action.note);
+      return { ...state, [action.note]: false };
+    }
+  }
+
+  throw Error("Unknown action: " + action.type);
+}
+
 function App() {
+  const [state, dispatch] = useReducer(reducer, initialState);
   const [midi, setMidi] = useState<WebMidi>();
-  const usbDevice = midi?.inputs[3];
-  console.log("👨‍🎤 -> App -> midi?.inputs:", midi?.inputs);
-  const [noteOn, setNoteOn] = useState<string>();
-  console.log("👨‍🎤 -> App -> noteOn:", noteOn);
-  const [notesOn, setNotesOn] = useState<string[]>([]);
+  const usbDevices = midi?.inputs;
+
+  const handleNoteOn = (note: string) => {
+    dispatch({ type: "note_on", note });
+  };
+
+  const handleNoteOff = (note: string) => {
+    dispatch({ type: "note_off", note });
+  };
 
   const enableWebMidi = async () => {
     WebMidi.enable()
@@ -45,19 +78,18 @@ function App() {
   }, []);
 
   useEffect(() => {
-    usbDevice?.channels[1].addListener("noteon", (e) => {
-      console.log("👨‍🎤 -> e.note.name:", e.note.name);
-      setNotesOn((prevNotes) => [...prevNotes, e.note.name]);
-      setNoteOn(e.note.name);
-    });
-
-    return () => {
-      usbDevice?.channels[1].removeListener("noteon", (e) => {
-        setNotesOn((prev = []) => [...prev, e.note.name]);
-        setNoteOn(e.note.name);
+    usbDevices?.forEach((device) => {
+      device.addListener("noteon", (e) => {
+        console.log(`Note on  :${e.note.name}${e.note.octave}`);
+        handleNoteOn(e.note.name);
       });
-    };
-  }, [usbDevice?.channels]);
+
+      device.addListener("noteoff", (e) => {
+        console.log(`Note off : ${e.note.name}${e.note.octave}`);
+        handleNoteOff(e.note.name);
+      });
+    });
+  }, [usbDevices]);
 
   return (
     <>
@@ -67,25 +99,25 @@ function App() {
         <Box display="flex" justifyContent="center">
           <Grid container width={500} height={100}>
             <Grid size="grow">
-              <KeyButton note="C" activeNote={noteOn}>C</KeyButton>
+              <KeyButton activeNote={state.C}>C</KeyButton>
             </Grid>
             <Grid size="grow">
-              <KeyButton note="D" activeNote={noteOn}>D</KeyButton>
+              <KeyButton activeNote={state.D}>D</KeyButton>
             </Grid>
             <Grid size="grow">
-              <KeyButton note="E" activeNote={noteOn}>E</KeyButton>
+              <KeyButton activeNote={state.E}>E</KeyButton>
             </Grid>
             <Grid size="grow">
-              <KeyButton note="F" activeNote={noteOn}>F</KeyButton>
+              <KeyButton activeNote={state.F}>F</KeyButton>
             </Grid>
             <Grid size="grow">
-              <KeyButton note="G" activeNote={noteOn}>G</KeyButton>
+              <KeyButton activeNote={state.G}>G</KeyButton>
             </Grid>
             <Grid size="grow">
-              <KeyButton note="A" activeNote={noteOn}>A</KeyButton>
+              <KeyButton activeNote={state.A}>A</KeyButton>
             </Grid>
             <Grid size="grow">
-              <KeyButton note="B" activeNote={noteOn}>B</KeyButton>
+              <KeyButton activeNote={state.B}>B</KeyButton>
             </Grid>
           </Grid>
         </Box>
