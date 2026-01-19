@@ -1,21 +1,26 @@
-export type State = {
-  [key: string]: boolean;
-};
+export const NOTES = [
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+  "A",
+  "A#",
+  "B",
+] as const;
 
-export const initialState: State = {
-  C: false,
-  "C#": false,
-  D: false,
-  "D#": false,
-  E: false,
-  F: false,
-  "F#": false,
-  G: false,
-  "G#": false,
-  A: false,
-  "A#": false,
-  B: false,
-};
+export type Note = (typeof NOTES)[number];
+
+export type State = Record<Note, boolean>;
+
+const initialState = NOTES.reduce(
+  (acc, currentValue) => ({ ...acc, [currentValue]: false }),
+  {} as State
+);
 
 export default function noteReducer(
   state: { [key: string]: boolean } = initialState,
@@ -31,5 +36,5 @@ export default function noteReducer(
     }
   }
 
-  throw Error("Unknown action: " + action.type);
+  throw new Error("Unknown action: " + action.type);
 }
