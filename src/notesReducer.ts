@@ -1,30 +1,15 @@
-export const NOTES = [
-  "C",
-  "C#",
-  "D",
-  "D#",
-  "E",
-  "F",
-  "F#",
-  "G",
-  "G#",
-  "A",
-  "A#",
-  "B",
-] as const;
-
-export type Note = (typeof NOTES)[number];
+import { NOTES, type Note } from "./types/notes";
 
 export type State = Record<Note, boolean>;
 
-const initialState = NOTES.reduce(
+export const initialState: State = NOTES.reduce(
   (acc, currentValue) => ({ ...acc, [currentValue]: false }),
-  {} as State
+  {} as State,
 );
 
 export default function noteReducer(
-  state: { [key: string]: boolean } = initialState,
-  action: { type: string; note: string }
+  state: State = initialState,
+  action: { type: string; note: string },
 ) {
   switch (action.type) {
     case "note_on": {

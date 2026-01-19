@@ -37,13 +37,13 @@ function App() {
     usbDevices?.forEach((device) => {
       device.addListener("noteon", (e) => {
         handleNoteOn(
-          `${e.note.name}${e.note.accidental ? e.note.accidental : ""}`
+          `${e.note.name}${e.note.accidental ? e.note.accidental : ""}`,
         );
       });
 
       device.addListener("noteoff", (e) => {
         handleNoteOff(
-          `${e.note.name}${e.note.accidental ? e.note.accidental : ""}`
+          `${e.note.name}${e.note.accidental ? e.note.accidental : ""}`,
         );
       });
     });
