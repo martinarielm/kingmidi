@@ -1,51 +1,71 @@
 import { Grid } from "@mui/material";
 import KeyButton from "./KeyButton";
 import type { State } from "../notesReducer";
+import { midiNumberToOctave } from "../utils/midi";
 
-export default function OctaveKeys({ state }: { state: State }) {
+function buildActivePitchClassesForOctave(state: State, octave: number) {
+  const activePitchClasses = new Set<number>();
+
+  state.forEach((midiNumber) => {
+    if (midiNumberToOctave(midiNumber) !== octave) return;
+    activePitchClasses.add(midiNumber % 12);
+  });
+
+  return activePitchClasses;
+}
+
+export default function OctaveKeys({
+  state,
+  octave,
+}: {
+  state: State;
+  octave: number;
+}) {
+  const activePitchClasses = buildActivePitchClassesForOctave(state, octave);
+
   return (
     <Grid container spacing={0}>
       <Grid size="grow">
-        <KeyButton activeNote={state.C}>C</KeyButton>
-        <KeyButton activeNote={state["C#"]} blackKey>
+        <KeyButton activeNote={activePitchClasses.has(0)}>C</KeyButton>
+        <KeyButton activeNote={activePitchClasses.has(1)} blackKey>
           C#
         </KeyButton>
       </Grid>
 
       <Grid size="grow">
-        <KeyButton activeNote={state.D}>D</KeyButton>
-        <KeyButton activeNote={state["D#"]} blackKey>
+        <KeyButton activeNote={activePitchClasses.has(2)}>D</KeyButton>
+        <KeyButton activeNote={activePitchClasses.has(3)} blackKey>
           D#
         </KeyButton>
       </Grid>
 
       <Grid size="grow">
-        <KeyButton activeNote={state.E}>E</KeyButton>
+        <KeyButton activeNote={activePitchClasses.has(4)}>E</KeyButton>
       </Grid>
 
       <Grid size="grow">
-        <KeyButton activeNote={state.F}>F</KeyButton>
-        <KeyButton activeNote={state["F#"]} blackKey>
+        <KeyButton activeNote={activePitchClasses.has(5)}>F</KeyButton>
+        <KeyButton activeNote={activePitchClasses.has(6)} blackKey>
           F#
         </KeyButton>
       </Grid>
 
       <Grid size="grow">
-        <KeyButton activeNote={state.G}>G</KeyButton>
-        <KeyButton activeNote={state["G#"]} blackKey>
+        <KeyButton activeNote={activePitchClasses.has(7)}>G</KeyButton>
+        <KeyButton activeNote={activePitchClasses.has(8)} blackKey>
           G#
         </KeyButton>
       </Grid>
 
       <Grid size="grow">
-        <KeyButton activeNote={state.A}>A</KeyButton>
-        <KeyButton activeNote={state["A#"]} blackKey>
+        <KeyButton activeNote={activePitchClasses.has(9)}>A</KeyButton>
+        <KeyButton activeNote={activePitchClasses.has(10)} blackKey>
           A#
         </KeyButton>
       </Grid>
 
       <Grid size="grow">
-        <KeyButton activeNote={state.B}>B</KeyButton>
+        <KeyButton activeNote={activePitchClasses.has(11)}>B</KeyButton>
       </Grid>
     </Grid>
   );

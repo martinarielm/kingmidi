@@ -1,25 +1,31 @@
-import { NOTES, type Note } from "./types/notes";
+export type State = Set<number>;
 
-export type State = Record<Note, boolean>;
+export const initialState: State = new Set();
 
-export const initialState: State = NOTES.reduce(
-  (acc, currentValue) => ({ ...acc, [currentValue]: false }),
-  {} as State,
-);
+type MidiAction =
+  | { type: "note_on"; note: number }
+  | { type: "note_off"; note: number };
 
 export default function noteReducer(
   state: State = initialState,
-  action: { type: string; note: string },
+  action: MidiAction,
 ) {
   switch (action.type) {
     case "note_on": {
-      return { ...state, [action.note]: true };
+      const nextState = new Set(state);
+      nextState.add(action.note);
+      return nextState;
     }
 
     case "note_off": {
-      return { ...state, [action.note]: false };
+      const nextState = new Set(state);
+      nextState.delete(action.note);
+      return nextState;
+    }
+
+    default: {
+      const _exhaustiveCheck: never = action;
+      throw new Error("Unknown action: " + JSON.stringify(_exhaustiveCheck));
     }
   }
-
-  throw new Error("Unknown action: " + action.type);
 }
