@@ -7,7 +7,7 @@ const KeyButton = styled(Box, {
   const colors = {
     border: blackKey ? "#373737" : "#eaeaea",
     note: blackKey ? "#FFF" : "#023047",
-    pressed: blackKey ? "#ffd166" : "#ffd166",
+    pressed: "#ffd166",
     rest: blackKey ? "#474747" : "#FFF",
     shadow: blackKey ? "#373737" : "#eaeaea",
   };

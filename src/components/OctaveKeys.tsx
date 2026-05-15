@@ -4,7 +4,7 @@ import type { State } from "../notesReducer";
 
 export default function OctaveKeys({ state }: { state: State }) {
   return (
-    <Grid container width={500} height={100}>
+    <Grid container spacing={0}>
       <Grid size="grow">
         <KeyButton activeNote={state.C}>C</KeyButton>
         <KeyButton activeNote={state["C#"]} blackKey>
