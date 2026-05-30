@@ -23,6 +23,7 @@ const KeyButton = styled(Box, {
     fontWeight: "bold",
     height: "100%",
     justifyContent: "center",
+    minWidth: "2em",
     paddingBottom: "10px",
   };
 

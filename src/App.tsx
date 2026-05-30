@@ -1,7 +1,6 @@
 import {
   Box,
   Container,
-  Grid,
   List,
   ListItem,
   ListItemText,
@@ -15,6 +14,7 @@ import OctaveKeys from "./components/OctaveKeys";
 import noteReducer, { initialState } from "./notesReducer";
 import OctaveSlider from "./components/OctaveSlider";
 import "./App.css";
+import KeyBedContainer from "./components/KeyBedContainer";
 
 type WebMidi = typeof WebMidi;
 
@@ -91,23 +91,21 @@ function App() {
     <>
       <ButtonAppBar />
 
-      <Container sx={{ pt: 5 }}>
-        <Grid container spacing={1}>
+      <Container sx={{ pt: 5 }} maxWidth="xl">
+        <KeyBedContainer octaves={activeOctaves.length} sx={{ pb: 2 }}>
           {[...activeOctaves].map((octave) => (
-            <Grid size={4} key={octave}>
-              <OctaveKeys state={state} octave={octave} />
-            </Grid>
+            <OctaveKeys state={state} octave={octave} key={octave} />
           ))}
-        </Grid>
+        </KeyBedContainer>
 
-        <Box sx={{ width: 300, mt: 5 }}>
+        <Box sx={{ width: 300, mt: 5, mx: "auto" }}>
           <OctaveSlider
             value={octaveRange}
             onChange={handleOctaveRangeChange}
           />
         </Box>
 
-        <Box sx={{ mt: 5 }}>
+        <Box sx={{ mt: 5, mx: "auto", width: "fit-content" }}>
           {midiDevices ? (
             <Paper elevation={2}>
               <List dense sx={{ display: "flex", gap: 1 }}>
