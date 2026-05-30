@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Container,
   List,
   ListItem,
@@ -9,18 +10,26 @@ import {
 } from "@mui/material";
 import { useEffect, useReducer, useState } from "react";
 import { WebMidi } from "webmidi";
+import * as Tone from "tone";
 import ButtonAppBar from "./components/ButtonAppBar";
 import OctaveKeys from "./components/OctaveKeys";
 import noteReducer, { initialState } from "./notesReducer";
 import OctaveSlider from "./components/OctaveSlider";
 import "./App.css";
 import KeyBedContainer from "./components/KeyBedContainer";
+import useSynth from "./hooks/useSynth";
 
 type WebMidi = typeof WebMidi;
 
 function App() {
   const [state, dispatch] = useReducer(noteReducer, initialState);
   const [midi, setMidi] = useState<WebMidi>();
+  const {
+    initializeAudio,
+    triggerAttack,
+    triggerRelease,
+    triggerAttackRelease,
+  } = useSynth();
   const [octaveRange, setOctaveRange] = useState<number[]>([2, 4]);
   const [minOctave, maxOctave] = octaveRange;
   const activeOctaves = Array.from(
@@ -28,6 +37,11 @@ function App() {
     (_, i) => minOctave + i,
   );
   const midiDevices = midi?.inputs;
+
+  const handleEnableAudio = async () => {
+    await initializeAudio();
+    triggerAttackRelease("C3", "8n");
+  };
 
   const handleOctaveRangeChange = (
     _e: Event,
@@ -71,10 +85,12 @@ function App() {
   useEffect(() => {
     midiDevices?.forEach((device) => {
       device.addListener("noteon", (e) => {
+        triggerAttack(Tone.Midi(e.note.number).toFrequency(), 0, e.note.attack);
         handleNoteOn(e.note.number);
       });
 
       device.addListener("noteoff", (e) => {
+        triggerRelease();
         handleNoteOff(e.note.number);
       });
     });
@@ -85,7 +101,7 @@ function App() {
         device.removeListener("noteoff");
       });
     };
-  }, [midiDevices]);
+  }, [midiDevices, triggerAttack, triggerRelease]);
 
   return (
     <>
@@ -104,6 +120,14 @@ function App() {
             onChange={handleOctaveRangeChange}
           />
         </Box>
+
+        <Button
+          onClick={handleEnableAudio}
+          variant="contained"
+          sx={{ mx: "auto", display: "block", mt: 1 }}
+        >
+          Enable Audio
+        </Button>
 
         <Box sx={{ mt: 5, mx: "auto", width: "fit-content" }}>
           {midiDevices ? (
