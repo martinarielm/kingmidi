@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import { useEffect, useReducer, useState } from "react";
 import { WebMidi } from "webmidi";
-import * as Tone from "tone";
 import ButtonAppBar from "./components/ButtonAppBar";
 import OctaveKeys from "./components/OctaveKeys";
 import noteReducer, { initialState } from "./notesReducer";
@@ -85,7 +84,7 @@ function App() {
   useEffect(() => {
     midiDevices?.forEach((device) => {
       device.addListener("noteon", (e) => {
-        triggerAttack(Tone.Midi(e.note.number).toFrequency(), 0, e.note.attack);
+        triggerAttack(midiToFrequency(e.note.number), 0, e.note.attack);
         handleNoteOn(e.note.number);
       });
 
@@ -147,6 +146,10 @@ function App() {
       </Container>
     </>
   );
+}
+
+function midiToFrequency(midiNote: number) {
+  return 440 * Math.pow(2, (midiNote - 69) / 12);
 }
 
 export default App;

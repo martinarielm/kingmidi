@@ -1,30 +1,36 @@
-import * as Tone from "tone";
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+type Time = string | number;
+
+type ToneModule = typeof import("tone");
 
 type UseSynthReturn = {
   initializeAudio: () => Promise<void>;
   isAudioInitialized: boolean;
   triggerAttack: (
     note: string | number,
-    time?: Tone.Unit.Time,
+    time?: Time,
     velocity?: number,
   ) => void;
-  triggerRelease: (time?: Tone.Unit.Time) => void;
+  triggerRelease: (time?: Time) => void;
   triggerAttackRelease: (
     note: string | number,
-    duration: Tone.Unit.Time,
-    time?: Tone.Unit.Time,
+    duration: Time,
+    time?: Time,
     velocity?: number,
   ) => void;
 };
 
 export default function useSynth(): UseSynthReturn {
-  const synthRef = useRef<Tone.Synth | null>(null);
+  const toneRef = useRef<ToneModule | null>(null);
+  const synthRef = useRef<any>(null);
+
   const initializedRef = useRef(false);
+  const initializationPromiseRef = useRef<Promise<void> | null>(null);
+
   const [isAudioInitialized, setIsAudioInitialized] = useState(false);
 
   useEffect(() => {
-    synthRef.current = new Tone.Synth().toDestination();
     return () => {
       synthRef.current?.dispose();
       synthRef.current = null;
@@ -33,32 +39,45 @@ export default function useSynth(): UseSynthReturn {
 
   const initializeAudio = useCallback(async () => {
     if (initializedRef.current) return;
-    await Tone.start();
-    initializedRef.current = true;
-    setIsAudioInitialized(true);
+
+    if (initializationPromiseRef.current) {
+      return initializationPromiseRef.current;
+    }
+
+    initializationPromiseRef.current = (async () => {
+      const Tone = await import("tone");
+
+      await Tone.start();
+
+      synthRef.current = new Tone.Synth().toDestination();
+      toneRef.current = Tone;
+
+      initializedRef.current = true;
+      setIsAudioInitialized(true);
+    })();
+
+    return initializationPromiseRef.current;
   }, []);
 
   const triggerAttack = useCallback(
-    (note: string | number, time?: Tone.Unit.Time, velocity?: number) => {
+    (note: string | number, time?: Time, velocity?: number) => {
       if (!initializedRef.current) return;
+
       synthRef.current?.triggerAttack(note, time, velocity);
     },
     [],
   );
 
-  const triggerRelease = useCallback((time?: Tone.Unit.Time) => {
+  const triggerRelease = useCallback((time?: Time) => {
     if (!initializedRef.current) return;
+
     synthRef.current?.triggerRelease(time);
   }, []);
 
   const triggerAttackRelease = useCallback(
-    (
-      note: string | number,
-      duration: Tone.Unit.Time,
-      time?: Tone.Unit.Time,
-      velocity?: number,
-    ) => {
+    (note: string | number, duration: Time, time?: Time, velocity?: number) => {
       if (!initializedRef.current) return;
+
       synthRef.current?.triggerAttackRelease(note, duration, time, velocity);
     },
     [],
