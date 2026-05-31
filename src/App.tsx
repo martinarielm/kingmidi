@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Chip,
   Container,
   List,
   ListItem,
@@ -17,12 +18,14 @@ import OctaveSlider from "./components/OctaveSlider";
 import "./App.css";
 import KeyBedContainer from "./components/KeyBedContainer";
 import useSynth from "./hooks/useSynth";
+import useSocketConnection from "./hooks/useSocketConnection";
 
 type WebMidi = typeof WebMidi;
 
 function App() {
   const [state, dispatch] = useReducer(noteReducer, initialState);
   const [midi, setMidi] = useState<WebMidi>();
+  const { isSocketConnected } = useSocketConnection();
   const {
     initializeAudio,
     triggerAttack,
@@ -128,7 +131,7 @@ function App() {
           Enable Audio
         </Button>
 
-        <Box sx={{ mt: 5, mx: "auto", width: "fit-content" }}>
+        <Box sx={{ mt: 6, mx: "auto", width: "fit-content" }}>
           {midiDevices ? (
             <Paper elevation={2}>
               <List dense sx={{ display: "flex", gap: 1 }}>
@@ -142,6 +145,15 @@ function App() {
           ) : (
             <Skeleton variant="rounded" width="100%" height={75} />
           )}
+        </Box>
+        <Box sx={{ my: 1, mx: "auto", width: "fit-content" }}>
+          <Chip
+            color={isSocketConnected ? "success" : "error"}
+            label={
+              isSocketConnected ? "Socket conectado" : "Socket desconectado"
+            }
+            size="small"
+          />
         </Box>
       </Container>
     </>
