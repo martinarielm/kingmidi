@@ -8,6 +8,7 @@ import {
   ListItemText,
   Paper,
   Skeleton,
+  Stack,
 } from "@mui/material";
 import { useEffect, useReducer, useState } from "react";
 import { WebMidi } from "webmidi";
@@ -19,13 +20,15 @@ import "./App.css";
 import KeyBedContainer from "./components/KeyBedContainer";
 import useSynth from "./hooks/useSynth";
 import useSocketConnection from "./hooks/useSocketConnection";
+import { useParams } from "react-router";
 
 type WebMidi = typeof WebMidi;
 
 function App() {
   const [state, dispatch] = useReducer(noteReducer, initialState);
+  const { roomId } = useParams();
+  const { isSocketConnected, roomUsers } = useSocketConnection(roomId);
   const [midi, setMidi] = useState<WebMidi>();
-  const { isSocketConnected } = useSocketConnection();
   const {
     initializeAudio,
     triggerAttack,
@@ -116,12 +119,15 @@ function App() {
           ))}
         </KeyBedContainer>
 
-        <Box sx={{ width: 300, mt: 5, mx: "auto" }}>
+        <Paper
+          elevation={2}
+          sx={{ width: 300, mt: 5, mx: "auto", px: 3, py: 1 }}
+        >
           <OctaveSlider
             value={octaveRange}
             onChange={handleOctaveRangeChange}
           />
-        </Box>
+        </Paper>
 
         <Button
           onClick={handleEnableAudio}
@@ -146,15 +152,26 @@ function App() {
             <Skeleton variant="rounded" width="100%" height={75} />
           )}
         </Box>
-        <Box sx={{ my: 1, mx: "auto", width: "fit-content" }}>
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ my: 1, mx: "auto", width: "fit-content" }}
+        >
           <Chip
             color={isSocketConnected ? "success" : "error"}
             label={
-              isSocketConnected ? "Socket conectado" : "Socket desconectado"
+              isSocketConnected ? "Socket connected" : "Socket disconnected"
             }
             size="small"
           />
-        </Box>
+          {roomId && (
+            <Chip
+              color={roomUsers >= 2 ? "success" : "warning"}
+              label={`Room ${roomId}: ${roomUsers}/2`}
+              size="small"
+            />
+          )}
+        </Stack>
       </Container>
     </>
   );
