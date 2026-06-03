@@ -3,12 +3,13 @@ import {
   Button,
   Chip,
   Container,
+  Grid,
   List,
   ListItem,
   ListItemText,
   Paper,
-  Skeleton,
   Stack,
+  Typography,
 } from "@mui/material";
 import { useEffect, useReducer, useState } from "react";
 import { WebMidi } from "webmidi";
@@ -115,69 +116,85 @@ function App() {
     <>
       <ButtonAppBar />
 
-      <Container sx={{ pt: 5 }} maxWidth="xl">
-        <KeyBedContainer octaves={activeOctaves.length} sx={{ pb: 2 }}>
-          {[...activeOctaves].map((octave) => (
-            <OctaveKeys state={state} octave={octave} key={octave} />
-          ))}
-        </KeyBedContainer>
+      <Container maxWidth="xl" sx={{ pb: 2 }}>
+        <Grid container sx={{ pt: 5, justifyContent: "center" }} spacing={4}>
+          <Grid size={12}>
+            <KeyBedContainer octaves={activeOctaves.length} sx={{ pb: 2 }}>
+              {[...activeOctaves].map((octave) => (
+                <OctaveKeys state={state} octave={octave} key={octave} />
+              ))}
+            </KeyBedContainer>
 
-        <Paper
-          elevation={2}
-          sx={{ width: 300, mt: 5, mx: "auto", px: 3, py: 1 }}
-        >
-          <OctaveSlider
-            value={octaveRange}
-            onChange={handleOctaveRangeChange}
-          />
-        </Paper>
-
-        <Button
-          onClick={handleEnableAudio}
-          variant="contained"
-          sx={{ mx: "auto", display: "block", mt: 1 }}
-        >
-          Enable Audio
-        </Button>
-
-        <Box sx={{ mt: 6, mx: "auto", width: "fit-content" }}>
-          {midiDevices ? (
-            <Paper elevation={2}>
-              <List dense sx={{ display: "flex", gap: 1 }}>
-                {midiDevices.map(({ id, name, manufacturer }) => (
-                  <ListItem key={id}>
-                    <ListItemText primary={name} secondary={manufacturer} />
-                  </ListItem>
-                ))}
-              </List>
+            <Paper
+              elevation={2}
+              sx={{ width: 300, mt: 5, mx: "auto", px: 3, py: 1 }}
+            >
+              <OctaveSlider
+                value={octaveRange}
+                onChange={handleOctaveRangeChange}
+              />
             </Paper>
-          ) : (
-            <Skeleton variant="rounded" width="100%" height={75} />
-          )}
-        </Box>
 
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{ my: 1, mx: "auto", width: "fit-content" }}
-        >
-          <Chip
-            color={isSocketConnected ? "success" : "error"}
-            label={
-              isSocketConnected ? "Socket connected" : "Socket disconnected"
-            }
-            size="small"
-          />
-          {roomId && (
-            <Chip
-              color={roomUsers >= 2 ? "success" : "warning"}
-              label={`Room ${roomId}: ${roomUsers}/2`}
-              size="small"
-            />
-          )}
-        </Stack>
+            <Button
+              onClick={handleEnableAudio}
+              variant="contained"
+              sx={{ mx: "auto", display: "block", mt: 1 }}
+            >
+              Enable Audio
+            </Button>
+          </Grid>
 
-        {roomId && <RoomChat roomId={roomId} />}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Stack spacing={1} sx={{ alignItems: "center" }}>
+              {roomId && (
+                <Box sx={{ width: "100%" }}>
+                  <RoomChat roomId={roomId} disabled={!isSocketConnected} />
+                </Box>
+              )}
+
+              <Box>
+                <Chip
+                  color={isSocketConnected ? "success" : "error"}
+                  label={
+                    isSocketConnected
+                      ? "Socket connected"
+                      : "Socket disconnected"
+                  }
+                  size="small"
+                />
+                {roomId && (
+                  <Chip
+                    color={roomUsers >= 2 ? "success" : "warning"}
+                    label={`Room ${roomId}: ${roomUsers}/2`}
+                    size="small"
+                  />
+                )}
+              </Box>
+            </Stack>
+          </Grid>
+        </Grid>
+
+        {midiDevices ? (
+          <Paper elevation={2} sx={{ mt: 3, mx: "auto", width: "fit-content" }}>
+            <List dense sx={{ display: "flex", gap: 1 }}>
+              {midiDevices.map(({ id, name, manufacturer }) => (
+                <ListItem key={id}>
+                  <ListItemText primary={name} secondary={manufacturer} />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        ) : (
+          <Paper
+            elevation={2}
+            sx={{ p: 3, mx: "auto", width: "fit-content", mt: 4 }}
+          >
+            <Typography variant="body1">
+              No MIDI devices detected, please connect a MIDI device and refresh
+              the page.
+            </Typography>
+          </Paper>
+        )}
       </Container>
     </>
   );

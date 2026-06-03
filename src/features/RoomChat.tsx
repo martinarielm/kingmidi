@@ -2,7 +2,13 @@ import { useState } from "react";
 import { Button, Grid, Paper, TextField, Typography } from "@mui/material";
 import useRoomMessages from "./useRoomMessages";
 
-export default function RoomChat({ roomId }: { roomId: string }) {
+export default function RoomChat({
+  roomId,
+  disabled,
+}: {
+  roomId: string;
+  disabled?: boolean;
+}) {
   const [message, setMessage] = useState("");
   const { messages, sendMessage } = useRoomMessages(roomId);
 
@@ -25,7 +31,8 @@ export default function RoomChat({ roomId }: { roomId: string }) {
           >
             {messages.map((roomMessage, index) => (
               <Typography key={`${roomMessage.senderId}-${index}`}>
-                {roomMessage.senderId}: {roomMessage.message}
+                <b>{roomMessage.senderId.slice(0, 4).toLocaleUpperCase()}</b>:{" "}
+                {roomMessage.message}
               </Typography>
             ))}
           </Paper>
@@ -33,16 +40,21 @@ export default function RoomChat({ roomId }: { roomId: string }) {
 
         <Grid size="grow">
           <TextField
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
             fullWidth
             label="Chat"
-            multiline
-            rows={2}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
         </Grid>
+
         <Grid size="auto">
-          <Button variant="contained" onClick={handleSend}>
+          <Button disabled={disabled} variant="contained" onClick={handleSend}>
             Send
           </Button>
         </Grid>
