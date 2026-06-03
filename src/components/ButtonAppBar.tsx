@@ -6,10 +6,10 @@ import Typography from "@mui/material/Typography";
 export default function ButtonAppBar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ bgcolor: "#8ecae6", color: "#023047" }}>
+      <AppBar position="static" sx={{ bgcolor: "#353535", color: "#ffffff" }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            King Marta
+            King MIDI
           </Typography>
         </Toolbar>
       </AppBar>

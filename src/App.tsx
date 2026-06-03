@@ -21,13 +21,16 @@ import KeyBedContainer from "./components/KeyBedContainer";
 import useSynth from "./hooks/useSynth";
 import useSocketConnection from "./hooks/useSocketConnection";
 import { useParams } from "react-router";
+import RoomChat from "./features/RoomChat";
+import useRoomPresence from "./features/useRoomPresence";
 
 type WebMidi = typeof WebMidi;
 
 function App() {
   const [state, dispatch] = useReducer(noteReducer, initialState);
   const { roomId } = useParams();
-  const { isSocketConnected, roomUsers } = useSocketConnection(roomId);
+  const { isSocketConnected } = useSocketConnection();
+  const { roomUsers } = useRoomPresence({ roomId, isSocketConnected });
   const [midi, setMidi] = useState<WebMidi>();
   const {
     initializeAudio,
@@ -152,6 +155,7 @@ function App() {
             <Skeleton variant="rounded" width="100%" height={75} />
           )}
         </Box>
+
         <Stack
           direction="row"
           spacing={1}
@@ -172,6 +176,8 @@ function App() {
             />
           )}
         </Stack>
+
+        {roomId && <RoomChat roomId={roomId} />}
       </Container>
     </>
   );
