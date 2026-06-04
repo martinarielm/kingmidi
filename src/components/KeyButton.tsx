@@ -13,11 +13,15 @@ const KeyButton = styled(Box, {
   };
 
   const styleProps = {
+    transition: "0.2s",
     alignItems: "flex-end",
-    backgroundColor: activeNote ? colors.pressed : colors.rest,
-    border: "2px solid " + colors.border,
+    backgroundColor: colors.rest,
+    backgroundImage: activeNote
+      ? "linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%)"
+      : "none",
+    border: "2px solid " + (activeNote ? "#fbc2eb" : colors.border),
     borderRadius: "10px !important",
-    boxShadow: "0 6px 0 0 " + colors.shadow,
+    boxShadow: "0 6px 0 0 " + (activeNote ? "#a18cd1" : colors.shadow),
     color: colors.note,
     display: "flex",
     fontWeight: "bold",
@@ -33,6 +37,11 @@ const KeyButton = styled(Box, {
     position: "relative",
     top: "-100%",
     width: "60%",
+    borderColor: activeNote ? "#bb91af" : colors.border,
+    boxShadow: "0 6px 0 0 " + (activeNote ? "#716393" : colors.shadow),
+    backgroundImage: activeNote
+      ? "linear-gradient(to top, #716393 0%, #bb91af 100%)"
+      : "none",
   };
 
   return blackKey ? { ...styleProps, ...blackKeyProps } : styleProps;
