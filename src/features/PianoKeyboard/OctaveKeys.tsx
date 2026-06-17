@@ -1,7 +1,7 @@
 import { Grid } from "@mui/material";
+import type { State } from "../../notesReducer";
+import { midiNumberToOctave } from "../../utils/midi";
 import KeyButton from "./KeyButton";
-import type { State } from "../notesReducer";
-import { midiNumberToOctave } from "../utils/midi";
 
 function buildActivePitchClassesForOctave(state: State, octave: number) {
   const activePitchClasses = new Set<number>();

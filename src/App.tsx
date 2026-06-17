@@ -14,16 +14,15 @@ import {
 import { useEffect, useReducer, useState } from "react";
 import { WebMidi } from "webmidi";
 import ButtonAppBar from "./components/ButtonAppBar";
-import OctaveKeys from "./components/OctaveKeys";
 import noteReducer, { initialState } from "./notesReducer";
 import OctaveSlider from "./components/OctaveSlider";
 import "./App.css";
-import KeyBedContainer from "./components/KeyBedContainer";
 import useSynth from "./hooks/useSynth";
 import useSocketConnection from "./hooks/useSocketConnection";
 import { useParams } from "react-router";
 import RoomChat from "./features/RoomChat";
 import useRoomPresence from "./features/useRoomPresence";
+import PianoKeyboard from "./features/PianoKeyboard/PianoKeyboard";
 
 type WebMidi = typeof WebMidi;
 
@@ -119,11 +118,7 @@ function App() {
       <Container maxWidth="xl" sx={{ pb: 2 }}>
         <Grid container sx={{ pt: 5, justifyContent: "center" }} spacing={4}>
           <Grid size={12}>
-            <KeyBedContainer octaves={activeOctaves.length} sx={{ pb: 2 }}>
-              {[...activeOctaves].map((octave) => (
-                <OctaveKeys state={state} octave={octave} key={octave} />
-              ))}
-            </KeyBedContainer>
+            <PianoKeyboard activeNotes={state} activeOctaves={activeOctaves} />
 
             <Paper
               elevation={2}
