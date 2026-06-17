@@ -48,8 +48,6 @@ The server lives one directory up at `../king-midi-server`.
 - Preserve the room URL shape `#/room/:roomId` unless the static hosting strategy changes.
 - Prefer focused changes; the app is still an early prototype and has limited test coverage.
 
-## Known Documentation Mismatches
+## Documentation Notes
 
-- `package.json` says version `0.2.1`, while `README.md` still says `0.1.0`.
-- `package.json` and `LICENSE.txt` indicate GPL-3.0, while `README.md` mentions AGPL-3.0.
-- `README.md` refers to `LICENSE`, but the file present is `LICENSE.txt`.
+- License metadata and `LICENSE.txt` should stay aligned with AGPL-3.0.

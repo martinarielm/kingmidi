@@ -6,7 +6,7 @@ simple on-screen keyboard and an octave control slider.
 
 ## Current status
 
-- Current version: `0.1.0`
+- Current version: `0.2.1`
 - Early-stage prototype: core note and chord logic is implemented.
 - Works as a prototype but is not production-ready.
 - UI improvements, full MIDI-device compatibility and general polish are still needed.
@@ -44,4 +44,4 @@ The official license is AGPL-3.0, so use must comply with its terms regarding co
 ## Notes
 
 - The repository can be public, but the license protects redistribution and derivative works under the same terms.
-- If you plan to reuse parts of the code in another project, please review the `LICENSE` file.
+- If you plan to reuse parts of the code in another project, please review the `LICENSE.txt` file.
