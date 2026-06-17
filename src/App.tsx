@@ -11,12 +11,12 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useEffect, useReducer, useState } from "react";
-import { WebMidi } from "webmidi";
 import ButtonAppBar from "./components/ButtonAppBar";
-import noteReducer, { initialState } from "./notesReducer";
 import OctaveSlider from "./components/OctaveSlider";
 import "./App.css";
+import useActiveNotes from "./hooks/useActiveNotes";
+import useMidiInput from "./hooks/useMidiInput";
+import useOctaveRange from "./hooks/useOctaveRange";
 import useSynth from "./hooks/useSynth";
 import useSocketConnection from "./hooks/useSocketConnection";
 import { useParams } from "react-router";
@@ -24,92 +24,30 @@ import RoomChat from "./features/RoomChat";
 import useRoomPresence from "./features/useRoomPresence";
 import PianoKeyboard from "./features/PianoKeyboard/PianoKeyboard";
 
-type WebMidi = typeof WebMidi;
-
 function App() {
-  const [state, dispatch] = useReducer(noteReducer, initialState);
   const { roomId } = useParams();
   const { isSocketConnected } = useSocketConnection();
   const { roomUsers } = useRoomPresence({ roomId, isSocketConnected });
-  const [midi, setMidi] = useState<WebMidi>();
+  const { activeNotes, handleNoteOff, handleNoteOn } = useActiveNotes();
   const {
     initializeAudio,
     triggerAttack,
     triggerRelease,
     triggerAttackRelease,
   } = useSynth();
-  const [octaveRange, setOctaveRange] = useState<number[]>([2, 4]);
-  const [minOctave, maxOctave] = octaveRange;
-  const activeOctaves = Array.from(
-    { length: Math.max(0, maxOctave - minOctave + 1) },
-    (_, i) => minOctave + i,
-  );
-  const midiDevices = midi?.inputs;
+  const { activeOctaves, handleOctaveRangeChange, octaveRange } =
+    useOctaveRange();
+  const { midiDevices } = useMidiInput({
+    onNoteOn: handleNoteOn,
+    onNoteOff: handleNoteOff,
+    triggerAttack,
+    triggerRelease,
+  });
 
   const handleEnableAudio = async () => {
     await initializeAudio();
     triggerAttackRelease("C3", "8n");
   };
-
-  const handleOctaveRangeChange = (
-    _e: Event,
-    newValue: number[],
-    activeThumb: number,
-  ) => {
-    const minOctaveDistance = 1;
-    if (activeThumb === 0) {
-      setOctaveRange([
-        Math.min(newValue[0], octaveRange[1] - minOctaveDistance),
-        octaveRange[1],
-      ]);
-    } else {
-      setOctaveRange([
-        octaveRange[0],
-        Math.max(newValue[1], octaveRange[0] + minOctaveDistance),
-      ]);
-    }
-  };
-
-  const handleNoteOn = (midiNumber: number) => {
-    dispatch({ type: "note_on", note: midiNumber });
-  };
-
-  const handleNoteOff = (midiNumber: number) => {
-    dispatch({ type: "note_off", note: midiNumber });
-  };
-
-  useEffect(() => {
-    const handleMidiEnabled = () => {
-      setMidi(WebMidi);
-    };
-    WebMidi.enable({ callback: handleMidiEnabled });
-
-    return () => {
-      WebMidi.disable();
-      setMidi(undefined);
-    };
-  }, []);
-
-  useEffect(() => {
-    midiDevices?.forEach((device) => {
-      device.addListener("noteon", (e) => {
-        triggerAttack(midiToFrequency(e.note.number), 0, e.note.attack);
-        handleNoteOn(e.note.number);
-      });
-
-      device.addListener("noteoff", (e) => {
-        triggerRelease();
-        handleNoteOff(e.note.number);
-      });
-    });
-
-    return () => {
-      midiDevices?.forEach((device) => {
-        device.removeListener("noteon");
-        device.removeListener("noteoff");
-      });
-    };
-  }, [midiDevices, triggerAttack, triggerRelease]);
 
   return (
     <>
@@ -118,7 +56,10 @@ function App() {
       <Container maxWidth="xl" sx={{ pb: 2 }}>
         <Grid container sx={{ pt: 5, justifyContent: "center" }} spacing={4}>
           <Grid size={12}>
-            <PianoKeyboard activeNotes={state} activeOctaves={activeOctaves} />
+            <PianoKeyboard
+              activeNotes={activeNotes}
+              activeOctaves={activeOctaves}
+            />
 
             <Paper
               elevation={2}
@@ -193,10 +134,6 @@ function App() {
       </Container>
     </>
   );
-}
-
-function midiToFrequency(midiNote: number) {
-  return 440 * Math.pow(2, (midiNote - 69) / 12);
 }
 
 export default App;

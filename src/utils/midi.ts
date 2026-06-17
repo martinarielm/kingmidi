@@ -26,3 +26,7 @@ export function midiNumberToPitchClass(midiNumber: number): NoteName {
 export function midiNumberToLabel(midiNumber: number) {
   return `${midiNumberToPitchClass(midiNumber)}${midiNumberToOctave(midiNumber)}`;
 }
+
+export function midiNumberToFrequency(midiNumber: number) {
+  return 440 * Math.pow(2, (midiNumber - 69) / 12);
+}

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 type Time = string | number;
 
 type ToneModule = typeof import("tone");
+type Synth = InstanceType<ToneModule["Synth"]>;
 
 type UseSynthReturn = {
   initializeAudio: () => Promise<void>;
@@ -23,7 +24,7 @@ type UseSynthReturn = {
 
 export default function useSynth(): UseSynthReturn {
   const toneRef = useRef<ToneModule | null>(null);
-  const synthRef = useRef<any>(null);
+  const synthRef = useRef<Synth | null>(null);
 
   const initializedRef = useRef(false);
   const initializationPromiseRef = useRef<Promise<void> | null>(null);
@@ -40,6 +41,7 @@ export default function useSynth(): UseSynthReturn {
   const initializeAudio = useCallback(async () => {
     if (initializedRef.current) return;
 
+    // Browser audio must start from a user gesture; cache the setup promise to avoid duplicate synths.
     if (initializationPromiseRef.current) {
       return initializationPromiseRef.current;
     }

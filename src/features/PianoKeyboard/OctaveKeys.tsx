@@ -3,6 +3,7 @@ import type { State } from "../../notesReducer";
 import { midiNumberToOctave } from "../../utils/midi";
 import KeyButton from "./KeyButton";
 
+// Convert active MIDI note numbers into pitch classes for this single octave.
 function buildActivePitchClassesForOctave(state: State, octave: number) {
   const activePitchClasses = new Set<number>();
 

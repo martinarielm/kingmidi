@@ -13,6 +13,7 @@ export default function PianoKeyboard({
 }: PianoKeyboardProps) {
   return (
     <KeyBedContainer octaves={activeOctaves.length} sx={{ pb: 2 }}>
+      {/* The parent owns octave selection; this component only renders the visible keys. */}
       {activeOctaves.map((octave) => (
         <OctaveKeys state={activeNotes} octave={octave} key={octave} />
       ))}
