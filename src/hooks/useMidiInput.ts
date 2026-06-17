@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { WebMidi } from "webmidi";
 import { midiNumberToFrequency } from "../utils/midi";
 
-type WebMidiModule = typeof WebMidi;
+type WebMidiModule = typeof import("webmidi").WebMidi;
 type MidiDevices = WebMidiModule["inputs"];
 
 interface UseMidiInputParams {
@@ -23,14 +22,25 @@ export default function useMidiInput({
 
   // WebMidi owns browser MIDI access, so this hook owns its enable/disable lifecycle.
   useEffect(() => {
+    let isMounted = true;
+    let enabledMidi: WebMidiModule | undefined;
+
     const handleMidiEnabled = () => {
-      setMidi(WebMidi);
+      if (!isMounted || !enabledMidi) return;
+
+      setMidi(enabledMidi);
     };
 
-    WebMidi.enable({ callback: handleMidiEnabled });
+    import("webmidi").then(({ WebMidi }) => {
+      if (!isMounted) return;
+
+      enabledMidi = WebMidi;
+      WebMidi.enable({ callback: handleMidiEnabled });
+    });
 
     return () => {
-      WebMidi.disable();
+      isMounted = false;
+      enabledMidi?.disable();
       setMidi(undefined);
     };
   }, []);

@@ -11,6 +11,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { lazy, Suspense } from "react";
 import ButtonAppBar from "./components/ButtonAppBar";
 import OctaveSlider from "./components/OctaveSlider";
 import "./App.css";
@@ -20,9 +21,10 @@ import useOctaveRange from "./hooks/useOctaveRange";
 import useSynth from "./hooks/useSynth";
 import useSocketConnection from "./hooks/useSocketConnection";
 import { useParams } from "react-router";
-import RoomChat from "./features/RoomChat";
 import useRoomPresence from "./features/useRoomPresence";
 import PianoKeyboard from "./features/PianoKeyboard/PianoKeyboard";
+
+const RoomChat = lazy(() => import("./features/RoomChat"));
 
 function App() {
   const { roomId } = useParams();
@@ -84,7 +86,9 @@ function App() {
             <Stack spacing={1} sx={{ alignItems: "center" }}>
               {roomId && (
                 <Box sx={{ width: "100%" }}>
-                  <RoomChat roomId={roomId} disabled={!isSocketConnected} />
+                  <Suspense fallback={null}>
+                    <RoomChat roomId={roomId} disabled={!isSocketConnected} />
+                  </Suspense>
                 </Box>
               )}
 
