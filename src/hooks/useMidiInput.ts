@@ -1,21 +1,16 @@
 import { useEffect, useState } from "react";
-import { midiNumberToFrequency } from "../utils/midi";
 
 type WebMidiModule = typeof import("webmidi").WebMidi;
 type MidiDevices = WebMidiModule["inputs"];
 
 interface UseMidiInputParams {
-  onNoteOn: (midiNumber: number) => void;
+  onNoteOn: (midiNumber: number, velocity?: number) => void;
   onNoteOff: (midiNumber: number) => void;
-  triggerAttack: (note: number, time?: number, velocity?: number) => void;
-  triggerRelease: (note: number, time?: number) => void;
 }
 
 export default function useMidiInput({
   onNoteOn,
   onNoteOff,
-  triggerAttack,
-  triggerRelease,
 }: UseMidiInputParams) {
   const [midi, setMidi] = useState<WebMidiModule>();
   const midiDevices: MidiDevices | undefined = midi?.inputs;
@@ -49,12 +44,11 @@ export default function useMidiInput({
   useEffect(() => {
     midiDevices?.forEach((device) => {
       device.addListener("noteon", (e) => {
-        triggerAttack(midiNumberToFrequency(e.note.number), 0, e.note.attack);
-        onNoteOn(e.note.number);
+        // Keep the MIDI layer thin: it only forwards the note and velocity upstream.
+        onNoteOn(e.note.number, e.note.attack);
       });
 
       device.addListener("noteoff", (e) => {
-        triggerRelease(midiNumberToFrequency(e.note.number));
         onNoteOff(e.note.number);
       });
     });
@@ -65,7 +59,7 @@ export default function useMidiInput({
         device.removeListener("noteoff");
       });
     };
-  }, [midiDevices, onNoteOff, onNoteOn, triggerAttack, triggerRelease]);
+  }, [midiDevices, onNoteOff, onNoteOn]);
 
   return { midiDevices };
 }

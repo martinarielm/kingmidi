@@ -8,6 +8,7 @@ type Synth = InstanceType<ToneModule["PolySynth"]>;
 type UseSynthReturn = {
   initializeAudio: () => Promise<void>;
   isAudioInitialized: boolean;
+  releaseAll: (time?: Time) => void;
   triggerAttack: (
     note: string | number,
     time?: Time,
@@ -70,6 +71,13 @@ export default function useSynth(): UseSynthReturn {
     [],
   );
 
+  const releaseAll = useCallback((time?: Time) => {
+    if (!initializedRef.current) return;
+
+    // Used when audio is disabled so the synth stops cleanly instead of waiting on note-offs.
+    synthRef.current?.releaseAll(time);
+  }, []);
+
   const triggerRelease = useCallback((note: string | number, time?: Time) => {
     if (!initializedRef.current) return;
 
@@ -88,6 +96,7 @@ export default function useSynth(): UseSynthReturn {
   return {
     initializeAudio,
     isAudioInitialized,
+    releaseAll,
     triggerAttack,
     triggerRelease,
     triggerAttackRelease,

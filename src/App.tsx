@@ -1,28 +1,28 @@
 import {
   Box,
-  Button,
   Chip,
   Container,
+  FormControlLabel,
   Grid,
   List,
   ListItem,
   ListItemText,
   Paper,
   Stack,
+  Switch,
   Typography,
 } from "@mui/material";
 import { lazy, Suspense } from "react";
 import ButtonAppBar from "./components/ButtonAppBar";
 import OctaveSlider from "./components/OctaveSlider";
 import "./App.css";
-import useActiveNotes from "./hooks/useActiveNotes";
+import PianoKeyboard from "./features/PianoKeyboard/PianoKeyboard";
+import useRoomPresence from "./features/useRoomPresence";
 import useMidiInput from "./hooks/useMidiInput";
 import useOctaveRange from "./hooks/useOctaveRange";
-import useSynth from "./hooks/useSynth";
+import usePlayableNotes from "./hooks/usePlayableNotes";
 import useSocketConnection from "./hooks/useSocketConnection";
 import { useParams } from "react-router";
-import useRoomPresence from "./features/useRoomPresence";
-import PianoKeyboard from "./features/PianoKeyboard/PianoKeyboard";
 
 const RoomChat = lazy(() => import("./features/RoomChat"));
 
@@ -30,26 +30,22 @@ function App() {
   const { roomId } = useParams();
   const { isSocketConnected } = useSocketConnection();
   const { roomUsers } = useRoomPresence({ roomId, isSocketConnected });
-  const { activeNotes, handleNoteOff, handleNoteOn } = useActiveNotes();
   const {
-    initializeAudio,
-    triggerAttack,
-    triggerRelease,
-    triggerAttackRelease,
-  } = useSynth();
+    activeNotes,
+    isAudioEnabled,
+    playMidiNote,
+    playPointerNote,
+    releaseMidiNote,
+    releasePointerNote,
+    setAudioEnabled,
+  } = usePlayableNotes();
   const { activeOctaves, handleOctaveRangeChange, octaveRange } =
     useOctaveRange();
-  const { midiDevices } = useMidiInput({
-    onNoteOn: handleNoteOn,
-    onNoteOff: handleNoteOff,
-    triggerAttack,
-    triggerRelease,
-  });
 
-  const handleEnableAudio = async () => {
-    await initializeAudio();
-    triggerAttackRelease("C3", "8n");
-  };
+  const { midiDevices } = useMidiInput({
+    onNoteOn: playMidiNote,
+    onNoteOff: releaseMidiNote,
+  });
 
   return (
     <>
@@ -61,6 +57,8 @@ function App() {
             <PianoKeyboard
               activeNotes={activeNotes}
               activeOctaves={activeOctaves}
+              onNoteOff={releasePointerNote}
+              onNoteOn={playPointerNote}
             />
 
             <Paper
@@ -71,15 +69,17 @@ function App() {
                 value={octaveRange}
                 onChange={handleOctaveRangeChange}
               />
-            </Paper>
 
-            <Button
-              onClick={handleEnableAudio}
-              variant="contained"
-              sx={{ mx: "auto", display: "block", mt: 1 }}
-            >
-              Enable Audio
-            </Button>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isAudioEnabled}
+                    onChange={(_event, checked) => setAudioEnabled(checked)}
+                  />
+                }
+                label="Enable Audio"
+              />
+            </Paper>
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
