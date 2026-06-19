@@ -51,7 +51,7 @@ function App() {
     <>
       <ButtonAppBar />
 
-      <Container maxWidth="xl" sx={{ pb: 2 }}>
+      <Container maxWidth="xl" sx={{ pb: 2, pt: 4 }}>
         <Grid container sx={{ pt: 5, justifyContent: "center" }} spacing={4}>
           <Grid size={12}>
             <PianoKeyboard
