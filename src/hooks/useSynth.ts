@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 type Time = string | number;
 
 type ToneModule = typeof import("tone");
-type Synth = InstanceType<ToneModule["Synth"]>;
+type Synth = InstanceType<ToneModule["PolySynth"]>;
 
 type UseSynthReturn = {
   initializeAudio: () => Promise<void>;
@@ -13,7 +13,7 @@ type UseSynthReturn = {
     time?: Time,
     velocity?: number,
   ) => void;
-  triggerRelease: (time?: Time) => void;
+  triggerRelease: (note: string | number, time?: Time) => void;
   triggerAttackRelease: (
     note: string | number,
     duration: Time,
@@ -51,7 +51,7 @@ export default function useSynth(): UseSynthReturn {
 
       await Tone.start();
 
-      synthRef.current = new Tone.Synth().toDestination();
+      synthRef.current = new Tone.PolySynth(Tone.Synth).toDestination();
       toneRef.current = Tone;
 
       initializedRef.current = true;
@@ -70,10 +70,10 @@ export default function useSynth(): UseSynthReturn {
     [],
   );
 
-  const triggerRelease = useCallback((time?: Time) => {
+  const triggerRelease = useCallback((note: string | number, time?: Time) => {
     if (!initializedRef.current) return;
 
-    synthRef.current?.triggerRelease(time);
+    synthRef.current?.triggerRelease(note, time);
   }, []);
 
   const triggerAttackRelease = useCallback(

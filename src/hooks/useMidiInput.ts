@@ -8,7 +8,7 @@ interface UseMidiInputParams {
   onNoteOn: (midiNumber: number) => void;
   onNoteOff: (midiNumber: number) => void;
   triggerAttack: (note: number, time?: number, velocity?: number) => void;
-  triggerRelease: () => void;
+  triggerRelease: (note: number, time?: number) => void;
 }
 
 export default function useMidiInput({
@@ -54,7 +54,7 @@ export default function useMidiInput({
       });
 
       device.addListener("noteoff", (e) => {
-        triggerRelease();
+        triggerRelease(midiNumberToFrequency(e.note.number));
         onNoteOff(e.note.number);
       });
     });
