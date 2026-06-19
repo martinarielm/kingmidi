@@ -32,6 +32,7 @@ export default function ButtonAppBar() {
           <Toolbar>
             <Typography
               variant="h6"
+              color="primary"
               component="div"
               sx={{
                 flexGrow: 1,

@@ -2,7 +2,6 @@ import {
   Box,
   Chip,
   Container,
-  FormControlLabel,
   Grid,
   List,
   ListItem,
@@ -54,30 +53,62 @@ function App() {
       <Container maxWidth="xl" sx={{ pb: 2, pt: 4 }}>
         <Grid container sx={{ pt: 5, justifyContent: "center" }} spacing={4}>
           <Grid size={12}>
-            <PianoKeyboard
-              activeNotes={activeNotes}
-              activeOctaves={activeOctaves}
-              onNoteOff={releasePointerNote}
-              onNoteOn={playPointerNote}
-            />
-
             <Paper
-              elevation={2}
-              sx={{ width: 300, mt: 5, mx: "auto", px: 3, py: 1 }}
+              elevation={5}
+              sx={{ backgroundColor: "#34373b", borderRadius: 2, p: 2 }}
             >
-              <OctaveSlider
-                value={octaveRange}
-                onChange={handleOctaveRangeChange}
-              />
+              <Stack direction="row" spacing={8} sx={{ mb: 3 }}>
+                <Box>
+                  <Typography
+                    variant="overline"
+                    sx={{
+                      color: "#fff",
+                      display: "block",
+                      fontFamily: "Quicksand",
+                      fontWeight: 500,
+                    }}
+                  >
+                    Enable Audio
+                  </Typography>
 
-              <FormControlLabel
-                control={
                   <Switch
                     checked={isAudioEnabled}
+                    size="small"
                     onChange={(_event, checked) => setAudioEnabled(checked)}
                   />
-                }
-                label="Enable Audio"
+                </Box>
+
+                <Box>
+                  <Typography
+                    variant="overline"
+                    sx={{
+                      color: "#fff",
+                      fontFamily: "Quicksand",
+                      fontWeight: 500,
+                    }}
+                  >
+                    Octave Range
+                  </Typography>
+                  <Box
+                    sx={{
+                      width: 200,
+                      // backgroundColor: "#383c40",
+                      // boxShadow: "inset 0 0 8px #242424",
+                    }}
+                  >
+                    <OctaveSlider
+                      value={octaveRange}
+                      onChange={handleOctaveRangeChange}
+                    />
+                  </Box>
+                </Box>
+              </Stack>
+
+              <PianoKeyboard
+                activeNotes={activeNotes}
+                activeOctaves={activeOctaves}
+                onNoteOff={releasePointerNote}
+                onNoteOn={playPointerNote}
               />
             </Paper>
           </Grid>
