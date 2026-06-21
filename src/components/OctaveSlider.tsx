@@ -11,8 +11,7 @@ export default function OctaveSlider({
 }: OctaveSliderProps) {
   return (
     <Slider
-      // sx={{ color: "#fff" }}
-      // color="info"
+      sx={{ position: "relative", top: "10px" }}
       disableSwap
       marks={marks}
       max={10}

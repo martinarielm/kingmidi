@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 
 type WebMidiModule = typeof import("webmidi").WebMidi;
-type MidiDevices = WebMidiModule["inputs"];
+export type MidiDevices = WebMidiModule["inputs"];
+export interface LastMidiInputDevice {
+  id: string;
+  manufacturer: string | null;
+  name: string;
+}
 
 interface UseMidiInputParams {
   onNoteOn: (midiNumber: number, velocity?: number) => void;
@@ -13,6 +18,8 @@ export default function useMidiInput({
   onNoteOff,
 }: UseMidiInputParams) {
   const [midi, setMidi] = useState<WebMidiModule>();
+  const [lastMidiInputDevice, setLastMidiInputDevice] =
+    useState<LastMidiInputDevice | null>(null);
   const midiDevices: MidiDevices | undefined = midi?.inputs;
 
   // WebMidi owns browser MIDI access, so this hook owns its enable/disable lifecycle.
@@ -44,6 +51,11 @@ export default function useMidiInput({
   useEffect(() => {
     midiDevices?.forEach((device) => {
       device.addListener("noteon", (e) => {
+        setLastMidiInputDevice({
+          id: device.id,
+          manufacturer: device.manufacturer,
+          name: device.name,
+        });
         // Keep the MIDI layer thin: it only forwards the note and velocity upstream.
         onNoteOn(e.note.number, e.note.attack);
       });
@@ -61,5 +73,5 @@ export default function useMidiInput({
     };
   }, [midiDevices, onNoteOff, onNoteOn]);
 
-  return { midiDevices };
+  return { lastMidiInputDevice, midiDevices };
 }

@@ -3,16 +3,13 @@ import {
   Chip,
   Container,
   Grid,
-  List,
-  ListItem,
-  ListItemText,
   Paper,
   Stack,
-  Switch,
   Typography,
 } from "@mui/material";
 import { lazy, Suspense } from "react";
 import ButtonAppBar from "./components/ButtonAppBar";
+import EnableAudioButton from "./components/EnableAudioButton";
 import OctaveSlider from "./components/OctaveSlider";
 import "./App.css";
 import PianoKeyboard from "./features/PianoKeyboard/PianoKeyboard";
@@ -22,6 +19,7 @@ import useOctaveRange from "./hooks/useOctaveRange";
 import usePlayableNotes from "./hooks/usePlayableNotes";
 import useSocketConnection from "./hooks/useSocketConnection";
 import { useParams } from "react-router";
+import MidiDeviceDisplay from "./components/MidiDeviceDisplay";
 
 const RoomChat = lazy(() => import("./features/RoomChat"));
 
@@ -41,7 +39,7 @@ function App() {
   const { activeOctaves, handleOctaveRangeChange, octaveRange } =
     useOctaveRange();
 
-  const { midiDevices } = useMidiInput({
+  const { lastMidiInputDevice } = useMidiInput({
     onNoteOn: playMidiNote,
     onNoteOff: releaseMidiNote,
   });
@@ -55,10 +53,30 @@ function App() {
           <Grid size={12}>
             <Paper
               elevation={5}
-              sx={{ backgroundColor: "#34373b", borderRadius: 2, p: 2 }}
+              sx={{ backgroundColor: "#34373b", borderRadius: 2, py: 2, px: 4 }}
             >
-              <Stack direction="row" spacing={8} sx={{ mb: 3 }}>
-                <Box>
+              <Grid
+                container
+                direction="row"
+                spacing={8}
+                sx={{
+                  mb: 3,
+                  alignItems: "flex-end",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Grid
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <EnableAudioButton
+                    isAudioEnabled={isAudioEnabled}
+                    onToggle={() => setAudioEnabled(!isAudioEnabled)}
+                  />
+
                   <Typography
                     variant="overline"
                     sx={{
@@ -70,30 +88,33 @@ function App() {
                   >
                     Enable Audio
                   </Typography>
+                </Grid>
 
-                  <Switch
-                    checked={isAudioEnabled}
-                    size="small"
-                    onChange={(_event, checked) => setAudioEnabled(checked)}
+                <Grid
+                  sx={{
+                    alignSelf: "start",
+                    borderRadius: 2,
+                    backgroundColor: "#0f0f0f",
+                    px: 1.5,
+                    py: 0.2,
+                  }}
+                >
+                  <MidiDeviceDisplay
+                    device={lastMidiInputDevice}
+                    isAudioEnabled={isAudioEnabled}
                   />
-                </Box>
+                </Grid>
 
-                <Box>
-                  <Typography
-                    variant="overline"
-                    sx={{
-                      color: "#fff",
-                      fontFamily: "Quicksand",
-                      fontWeight: 500,
-                    }}
-                  >
-                    Octave Range
-                  </Typography>
+                <Grid
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
                   <Box
                     sx={{
                       width: 200,
-                      // backgroundColor: "#383c40",
-                      // boxShadow: "inset 0 0 8px #242424",
                     }}
                   >
                     <OctaveSlider
@@ -101,8 +122,20 @@ function App() {
                       onChange={handleOctaveRangeChange}
                     />
                   </Box>
-                </Box>
-              </Stack>
+
+                  <Typography
+                    variant="overline"
+                    sx={{
+                      color: "#fff",
+                      display: "block",
+                      fontFamily: "Quicksand",
+                      fontWeight: 500,
+                    }}
+                  >
+                    Octave Range
+                  </Typography>
+                </Grid>
+              </Grid>
 
               <PianoKeyboard
                 activeNotes={activeNotes}
@@ -144,28 +177,6 @@ function App() {
             </Stack>
           </Grid>
         </Grid>
-
-        {midiDevices ? (
-          <Paper elevation={2} sx={{ mt: 3, mx: "auto", width: "fit-content" }}>
-            <List dense sx={{ display: "flex", gap: 1 }}>
-              {midiDevices.map(({ id, name, manufacturer }) => (
-                <ListItem key={id}>
-                  <ListItemText primary={name} secondary={manufacturer} />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-        ) : (
-          <Paper
-            elevation={2}
-            sx={{ p: 3, mx: "auto", width: "fit-content", mt: 4 }}
-          >
-            <Typography variant="body1">
-              No MIDI devices detected, please connect a MIDI device and refresh
-              the page.
-            </Typography>
-          </Paper>
-        )}
       </Container>
     </>
   );
