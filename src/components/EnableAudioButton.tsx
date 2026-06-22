@@ -27,7 +27,6 @@ function EnableAudioButton({
         display: "inline-flex",
         height: 25,
         justifyContent: "center",
-        mt: 0.5,
         transition: "box-shadow 180ms ease, background 180ms ease",
         width: 25,
         "&:hover": {

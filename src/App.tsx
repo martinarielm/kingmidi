@@ -1,12 +1,4 @@
-import {
-  Box,
-  Chip,
-  Container,
-  Grid,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Chip, Grid, Paper, Stack, Typography } from "@mui/material";
 import { lazy, Suspense } from "react";
 import ButtonAppBar from "./components/ButtonAppBar";
 import EnableAudioButton from "./components/EnableAudioButton";
@@ -48,51 +40,52 @@ function App() {
     <>
       <ButtonAppBar />
 
-      <Container maxWidth="xl" sx={{ pb: 2, pt: 4 }}>
-        <Grid container sx={{ pt: 5, justifyContent: "center" }} spacing={4}>
-          <Grid size={12}>
-            <Paper
-              elevation={5}
-              sx={{ backgroundColor: "#34373b", borderRadius: 2, py: 2, px: 4 }}
+      <Grid container sx={{ mt: 9, mb: 2, px: 2 }} spacing={4}>
+        <Grid size={12}>
+          <Paper
+            elevation={5}
+            sx={{
+              backgroundColor: "#34373b",
+              borderRadius: 2,
+              py: 2,
+              px: { xs: 2, sm: 4 },
+            }}
+          >
+            <Grid
+              container
+              columnSpacing={4}
+              sx={{
+                mb: 3,
+              }}
             >
               <Grid
-                container
-                direction="row"
-                spacing={8}
+                size={{ xs: 4, lg: 2, xl: 2 }}
                 sx={{
-                  mb: 3,
-                  alignItems: "flex-end",
-                  justifyContent: "space-between",
+                  display: "flex",
+                  alignItems: "center",
                 }}
               >
-                <Grid
+                <Typography
+                  variant="overline"
                   sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
+                    color: "#ffffff",
+                    opacity: 0.9,
+                    fontFamily: "Quicksand",
+                    fontWeight: 500,
+                    mr: 1,
                   }}
                 >
-                  <EnableAudioButton
-                    isAudioEnabled={isAudioEnabled}
-                    onToggle={() => setAudioEnabled(!isAudioEnabled)}
-                  />
+                  Power
+                </Typography>
+                <EnableAudioButton
+                  isAudioEnabled={isAudioEnabled}
+                  onToggle={() => setAudioEnabled(!isAudioEnabled)}
+                />
+              </Grid>
 
-                  <Typography
-                    variant="overline"
-                    sx={{
-                      color: "#fff",
-                      display: "block",
-                      fontFamily: "Quicksand",
-                      fontWeight: 500,
-                    }}
-                  >
-                    Enable Audio
-                  </Typography>
-                </Grid>
-
-                <Grid
+              <Grid size={{ xs: "grow", lg: "grow", xl: "grow" }}>
+                <Box
                   sx={{
-                    alignSelf: "start",
                     borderRadius: 2,
                     backgroundColor: "#0f0f0f",
                     px: 1.5,
@@ -103,81 +96,83 @@ function App() {
                     device={lastMidiInputDevice}
                     isAudioEnabled={isAudioEnabled}
                   />
-                </Grid>
-
-                <Grid
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 200,
-                    }}
-                  >
-                    <OctaveSlider
-                      value={octaveRange}
-                      onChange={handleOctaveRangeChange}
-                    />
-                  </Box>
-
-                  <Typography
-                    variant="overline"
-                    sx={{
-                      color: "#fff",
-                      display: "block",
-                      fontFamily: "Quicksand",
-                      fontWeight: 500,
-                    }}
-                  >
-                    Octave Range
-                  </Typography>
-                </Grid>
+                </Box>
               </Grid>
 
+              <Grid
+                size={{ xs: 12, lg: "grow", xl: "grow" }}
+                sx={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  justifyContent: { lg: "end" },
+                }}
+              >
+                <Typography
+                  variant="overline"
+                  sx={{
+                    color: "#fff",
+                    fontFamily: "Quicksand",
+                    fontWeight: 500,
+                    mr: 2,
+                  }}
+                >
+                  Octave Range
+                </Typography>
+
+                <Box
+                  sx={{
+                    width: 200,
+                    pr: 0.5,
+                  }}
+                >
+                  <OctaveSlider
+                    value={octaveRange}
+                    onChange={handleOctaveRangeChange}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
+
+            <Box sx={{ height: 200 }}>
               <PianoKeyboard
                 activeNotes={activeNotes}
                 activeOctaves={activeOctaves}
                 onNoteOff={releasePointerNote}
                 onNoteOn={playPointerNote}
               />
-            </Paper>
-          </Grid>
+            </Box>
+          </Paper>
+        </Grid>
 
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Stack spacing={1} sx={{ alignItems: "center" }}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Stack spacing={2} sx={{ alignItems: "center" }}>
+            {roomId && (
+              <Box sx={{ width: "100%" }}>
+                <Suspense fallback={null}>
+                  <RoomChat roomId={roomId} disabled={!isSocketConnected} />
+                </Suspense>
+              </Box>
+            )}
+
+            <Stack direction="row" spacing={2}>
+              <Chip
+                color={isSocketConnected ? "success" : "error"}
+                label={
+                  isSocketConnected ? "Socket connected" : "Socket disconnected"
+                }
+                size="small"
+              />
               {roomId && (
-                <Box sx={{ width: "100%" }}>
-                  <Suspense fallback={null}>
-                    <RoomChat roomId={roomId} disabled={!isSocketConnected} />
-                  </Suspense>
-                </Box>
-              )}
-
-              <Box>
                 <Chip
-                  color={isSocketConnected ? "success" : "error"}
-                  label={
-                    isSocketConnected
-                      ? "Socket connected"
-                      : "Socket disconnected"
-                  }
+                  color={roomUsers >= 2 ? "success" : "warning"}
+                  label={`Room ${roomId}: ${roomUsers}/2`}
                   size="small"
                 />
-                {roomId && (
-                  <Chip
-                    color={roomUsers >= 2 ? "success" : "warning"}
-                    label={`Room ${roomId}: ${roomUsers}/2`}
-                    size="small"
-                  />
-                )}
-              </Box>
+              )}
             </Stack>
-          </Grid>
+          </Stack>
         </Grid>
-      </Container>
+      </Grid>
     </>
   );
 }

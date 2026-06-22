@@ -12,7 +12,7 @@ const KeyButtonBase = styled(Box, {
 })<KeyButtonStyleProps>(({ activeNote, blackKey }) => {
   const colors = {
     border: blackKey ? "#373737" : "#eaeaea",
-    note: blackKey ? "#FFF" : "#023047",
+    note: blackKey ? "#FFFFFF80" : "#00000080",
     pressed: "#ffd166",
     rest: blackKey ? "#474747" : "#FFF",
     shadow: blackKey ? "#373737" : "#eaeaea",
@@ -27,15 +27,16 @@ const KeyButtonBase = styled(Box, {
       : "none",
     border: "2px solid " + (activeNote ? "#fbc2eb" : colors.border),
     borderRadius: "10px !important",
+    fontFamily: "Quicksand",
+    fontWeight: 600,
     boxShadow: "0 6px 0 0 " + (activeNote ? "#a18cd1" : colors.shadow),
     color: colors.note,
     display: "flex",
-    fontWeight: "bold",
     height: "100%",
     justifyContent: "center",
     cursor: "pointer" as const,
-    minWidth: "2em",
-    paddingBottom: "10px",
+    minWidth: "1.5em",
+    paddingBottom: "8px",
     userSelect: "none" as const,
     touchAction: "none" as const,
   };
@@ -43,6 +44,9 @@ const KeyButtonBase = styled(Box, {
   const blackKeyProps = {
     height: "50%",
     left: "70%",
+    fontSize: "0.75em",
+    paddingBottom: "5px",
+    borderRadius: "6px !important",
     position: "relative" as const,
     top: "-100%",
     width: "60%",

@@ -22,12 +22,24 @@ export default function RoomChat({
   };
 
   return (
-    <Paper elevation={2} sx={{ p: 3 }}>
+    <Paper
+      elevation={5}
+      sx={{
+        backgroundColor: "#34373b",
+        borderRadius: 2,
+        p: { xs: 2, sm: 3 },
+      }}
+    >
       <Grid container spacing={2}>
         <Grid size={12}>
           <Paper
             variant="outlined"
-            sx={{ p: 2, height: 150, overflowY: "auto" }}
+            sx={{
+              p: 2,
+              height: 150,
+              overflowY: "auto",
+              // color: "#fff",
+            }}
           >
             {messages.map((roomMessage, index) => (
               <Typography key={`${roomMessage.senderId}-${index}`}>
@@ -49,6 +61,8 @@ export default function RoomChat({
             fullWidth
             label="Chat"
             value={message}
+            size="small"
+            sx={{ color: "white" }}
             onChange={(e) => setMessage(e.target.value)}
           />
         </Grid>

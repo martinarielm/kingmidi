@@ -4,7 +4,7 @@ const MIN_OCTAVE_DISTANCE = 1;
 
 // Owns the visible octave window while keeping the range handles from crossing.
 export default function useOctaveRange() {
-  const [octaveRange, setOctaveRange] = useState<number[]>([2, 4]);
+  const [octaveRange, setOctaveRange] = useState<number[]>([2, 5]);
   const [minOctave, maxOctave] = octaveRange;
 
   const activeOctaves = useMemo(

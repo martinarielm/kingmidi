@@ -6,6 +6,7 @@ export const colors = {
 
 const theme = createTheme({
   palette: {
+    mode: "dark",
     primary: {
       main: colors.primary,
     },
